@@ -1,0 +1,8 @@
+SELECT 
+kc.rating
+FROM
+  `rakamin-kf-analytics-478914.Kimia_Farma.final_transcation` AS ft
+LEFT JOIN
+  `rakamin-kf-analytics-478914.Kimia_Farma.kantor_cabang` AS kc
+ON
+ft.branch_id = kc.branch_id
