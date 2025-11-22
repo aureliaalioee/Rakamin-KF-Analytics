@@ -1,8 +1,30 @@
 SELECT 
-kc.rating
+kc.rating,
+ft.customer_name,
+ft.product_id,
+p.product_name,
+ft.price,
+ft.discount_percentage,
+
+ft.price*(1-ft.discount_percentage) AS nett_sales,
+
+CASE 
+  WHEN ft.price <= 50000 THEN 0.10
+  WHEN ft.price > 50000 AND ft.price < 50000 THEN 0.15
+  WHEN ft.price > 100000 AND ft.price < 300000 THEN 0.20
+  WHEN ft.price > 300000 AND ft.price < 500000 THEN 0.25
+  WHEN ft.price > 500000 THEN 0.30
+  ELSE 0
+END AS persentase_gross_laba
+
+
 FROM
   `rakamin-kf-analytics-478914.Kimia_Farma.final_transcation` AS ft
 LEFT JOIN
   `rakamin-kf-analytics-478914.Kimia_Farma.kantor_cabang` AS kc
 ON
-ft.branch_id = kc.branch_id
+  ft.branch_id = kc.branch_id
+LEFT JOIN
+ `rakamin-kf-analytics-478914.Kimia_Farma.product` AS p
+ON
+  ft.product_id = p.product_id;
