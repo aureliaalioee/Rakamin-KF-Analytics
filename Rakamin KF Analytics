@@ -1,3 +1,11 @@
+WITH nett_sales_calculation AS(
+SELECT transaction_id, price, discount_percentage,
+        price*(1-discount_percentage) AS nett_sales
+
+FROM `rakamin-kf-analytics-478914.Kimia_Farma.final_transcation`
+
+)
+
 SELECT 
 kc.rating,
 ft.customer_name,
@@ -5,21 +13,33 @@ ft.product_id,
 p.product_name,
 ft.price,
 ft.discount_percentage,
+nsc.nett_sales,
+ft.rating,
 
-ft.price*(1-ft.discount_percentage) AS nett_sales,
+--ft.price*(1-ft.discount_percentage) AS nett_sales,
 
 CASE 
   WHEN ft.price <= 50000 THEN 0.10
-  WHEN ft.price > 50000 AND ft.price < 50000 THEN 0.15
+  WHEN ft.price > 50000 AND ft.price < 100000 THEN 0.15
   WHEN ft.price > 100000 AND ft.price < 300000 THEN 0.20
   WHEN ft.price > 300000 AND ft.price < 500000 THEN 0.25
   WHEN ft.price > 500000 THEN 0.30
-  ELSE 0
-END AS persentase_gross_laba
+END AS persentase_gross_laba,
+
+CASE
+  WHEN ft.price <= 50000 THEN nett_sales * 0.10
+  WHEN ft.price > 50000 AND ft.price < 100000 THEN nett_sales * 0.15
+  WHEN ft.price > 100000 AND ft.price < 300000 THEN nett_sales * 0.20
+  WHEN ft.price > 300000 AND ft.price < 500000 THEN nett_Sales * 0.25
+  WHEN ft.price > 500000 THEN nett_sales * 0.30
+END AS nett_profit
 
 
 FROM
   `rakamin-kf-analytics-478914.Kimia_Farma.final_transcation` AS ft
+LEFT JOIN 
+  nett_sales_calculation AS nsc
+ON ft.transaction_id = nsc.transaction_id
 LEFT JOIN
   `rakamin-kf-analytics-478914.Kimia_Farma.kantor_cabang` AS kc
 ON
